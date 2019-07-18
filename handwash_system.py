@@ -83,14 +83,14 @@ class HandwashSystem:
         self.live_stream = cv2.VideoCapture(0)
         print("Video Stream started successfully.")
         print("Changing video stream resolution..")
-        live_stream.set(3, 1080)
-        live_stream.set(4, 1080)
+        self.live_stream.set(3, 1080)
+        self.live_stream.set(4, 1080)
         time.sleep(1)
 
         print("Video Stream resolution changed to: 1080x1080")
 
         # Previous frame stored to generate optical flow
-        self.previous_frame = null
+        self.previous_frame = None
 
         # Circular system counter to keep count of frames
         self.frame_count = 0
@@ -144,7 +144,7 @@ class HandwashSystem:
             frame_object.preprocess(28)
 
             # Generate the optical flow for the image
-            frame_object.generate_optical_flow(previous_frame)
+            # frame_object.generate_optical_flow(previous_frame)
 
             # Predict the frame
 
@@ -163,13 +163,13 @@ class HandwashSystem:
 
 
     def check_buffer(self):
-    '''
-    Function to check FrameBuffer, and interface it with the
-    HandwashSteps module.
-    This fuction is called repeatedly, with an interval of: check_buffer_interval
-    '''
+        '''
+        Function to check FrameBuffer, and interface it with the
+        HandwashSteps module.
+        This fuction is called repeatedly, with an interval of: check_buffer_interval
+        '''
 
-    step_completed = self.frame_buffer.get_step_predicted()
+        step_completed = self.frame_buffer.get_step_predicted()
 
 
 

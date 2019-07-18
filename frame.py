@@ -59,6 +59,42 @@ import matplotlib.pyplot as plt
 # Variable to identify individual frames
 global_frame_id = 1
 
+'''
+Flow Options
+'''
+alpha = 0.012
+ratio = 0.75
+minWidth = 20
+nOuterFPIterations = 7
+nInnerFPIterations = 1
+nSORIterations = 30
+colType = 0  # 0 or default:RGB, 1:GRAY (but pass gray image with shape (h,w,1))
+
+
+''' 
+Setting Image Parameters
+'''
+image_height = 112
+image_width = 112
+
+
+def process_flow(im1, flow_vector):
+    '''
+    Function to convert flow vector to image
+    '''
+    hsv = np.zeros(im1.shape, dtype=np.uint8)
+    hsv[:, :, 0] = 255
+    hsv[:, :, 1] = 255
+    mag, ang = cv2.cartToPolar(flow_vector[..., 0], flow_vector[..., 1])
+    hsv[..., 0] = ang * 180 / np.pi / 2
+    hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+    
+    # rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+
+    h, s, grayscale = cv2.split(hsv)
+
+    return(grayscale)
+
 
 class Frame:
     '''
@@ -218,14 +254,21 @@ class Frame:
         '''
 
         assert (self.dense_optical_flow_vector == False), "Optical Flow already generated for the current frame."
-        hsv_array = np.zeros(self.pixel_values_array.shape, dtype=np.uint8)
-        hsv_array[:, :, 0] = 255
-        hsv_array[:, :, 1] = 255
-        magnitude, angle = cv2.cartToPolar(self.pixel_values_array[..., 0], self.pixel_values_array[..., 1])
-        hsv_array[..., 0] = angle * 180 / np.pi / 2
-        hsv_array[..., 2] = cv2.normalize(magnitude, None, 0, 255, cv2.NORM_MINMAX)
+
+        # Numpy Arrays
+        previous_temporal_image = previous_frame.astype(float) / 255.
+        next_temporal_image = self.pixel_values_array.astype(float) / 255.
+
+        # Adding new method
+        u, v, im2W = pyflow.coarse2fine_flow(previous_temporal_image, next_temporal_image, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations,nSORIterations, colType)
+        temporal_image = np.concatenate((u[..., None], v[..., None]), axis=2)
+        temporal_image = process_flow(next_temporal_image, temporal_image)
+
         
-        self.placeholder_dense_optical_flow_vector = True
+        # temporal_image_grayscale = cv2.cvtColor(temporal_image, cv2.COLOR_BGR2GRAY)
+        temporal_image_after_reshape = np.reshape(temporal_image, (1, image_width, image_height, 1))
+        
+        self.placeholder_dense_optical_flow_vector = temporal_image_after_reshape
 
         self.dense_optical_flow_vector = cv2.split(hsv_array)[2]
 
@@ -285,11 +328,22 @@ class Frame:
             print("Dense Optical Flow Generated\t: Yes")
         
 
-    def predict_frame(self):
+    def predict_frame(self, previous_frame):
         '''
         Function to actually predict the frame
         '''
-        # TODO: The actual prediction
+
+        # TODO: CLEAN THIS CODE
+        current_prediction = fusion_model.predict([np.array(spatial_image_after_reshape), np.array(temporal_image_after_reshape)])
+        current_predictions.append(current_prediction)
+        predicted_frames += 1
+
+        class_prediction = np.argmax(current_prediction)
+        class_prob = round(current_prediction[0][class_prediction], 4)
+
+        predicted_class_text = printed_class_conversion[class_prediction]
+
+        print("Predictions: ", class_conversion[class_prediction])
 
 
     def get_frame_id(self):

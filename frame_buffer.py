@@ -103,7 +103,7 @@ class FrameBuffer:
         Function to add frame_objects to the Frame Buffer
         The Frame Buffer itself is implemented as a circular
         Queue, where the N ('buffer_size') most recent frame
-        objects are maintained in the Frame Buffer 
+        objects are maintained in the Frame Buffer
 
         Parameters:
         @frame_object : The frame object to be added to the buffer
