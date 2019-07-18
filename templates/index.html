@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Handwash System </title>
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+        <style>
+            body {
+                background: #d8eff0;
+                font-family: 'Roboto';
+                font-size: 22px;
+            }
+            .main_container {
+                display: flex;
+                justify-content: space-around;
+                padding: 20px 0;
+                width: 80vw;
+                height: 80vh;
+            }
+            #live_video_feed {
+                display: flex;
+                padding-top: 5vh;
+            }
+            #current_step_gif {
+                max-width: 300px;
+                max-height: 300px;
+                display:block;
+            }
+            #step_information {
+                display: block;
+            }
+            .column1 {
+                float: left;
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Handwash System</h1>
+        <div class = "main_container">
+            <img id="live_video_feed" src="{{ url_for('video_feed') }}">
+            <img id="current_step_gif" src="{{ url_for('video_feed') }}">
+            <div id="step_information">
+                <div class="column1">
+                    <img class="step_image"> <h3> Step 1 </h3>
+                    <img class="step_image"> <h3> Step 2 </h3>
+                    <img class="step_image"> <h3> Step 3 </h3>
+                    <img class="step_image"> <h3> Step 4 </h3>
+                </div>
+                <!-- <div class="column2">
+                    <img class="step_image"> <h3> Step 5 </h3>
+                    <img class="step_image"> <h3> Step 6 </h3>
+                    <img class="step_image"> <h3> Step 7 </h3>
+                    <img class="step_image"> <h3> Step 8 </h3>
+                </div> -->
+            </div>
+        </div>
+    </body>
+</html>
