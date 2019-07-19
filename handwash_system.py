@@ -32,6 +32,9 @@ import time
 # Warnings import to warn user of certain pitfalls of the system
 import warnings
 
+# Import threading to multi-thread the application
+import threading
+
 # Numpy import for array manipulation
 import numpy as np
 
@@ -50,8 +53,8 @@ import matplotlib.pyplot as plt
 # from keras.models import load_model, Sequential
 # from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 
-# Scikit Learn import for the splitting of the dataset into
-# training and testing sets
+# # Scikit Learn import for the splitting of the dataset into
+# # training and testing sets
 # from sklearn.model_selection import train_test_split
 
 # Variable to identify individual frames
@@ -66,7 +69,7 @@ import frame_buffer as FrameBuffer
 import handwash_steps as HandwashSteps
 
 # Initialize a previous temporal image
-previous_temporal_image = np.array([0])
+previous_frame = np.array([0])
 
 class HandwashSystem:
 
@@ -78,6 +81,9 @@ class HandwashSystem:
 
         # Initialize the Frame Buffer of size 15
         self.frame_buffer = FrameBuffer.FrameBuffer(15)
+
+        # HandwashSteps
+        self.handwash_steps = HandwashSteps.HandwashSteps()
 
         # Initialize the Video Stream
         self.live_stream = cv2.VideoCapture(0)
@@ -93,13 +99,13 @@ class HandwashSystem:
         self.previous_frame = None
 
         # Circular system counter to keep count of frames
-        self.frame_count = 0
+        self.frame_count = 1
 
         # Sampling rate of frames for prediction
         # In a 30 FPS Video, a sampling rate of 5
         # would mean: 1 in 5 frames are sampled for prediction
         # Therefore, every second, 6 frames are sampled
-        self.sampling_rate = 15
+        self.sampling_rate = 5
 
         # Property to set default FPS of the video stream
         self.video_fps = 30
@@ -130,8 +136,8 @@ class HandwashSystem:
         jpeg bytes is the format used by the Flask server to display the 
         live stream
         '''
-        # Increment frame_count
-        self.frame_count += 1
+
+        global previous_frame
         
         # Read the live feed frame
         success, image = self.live_stream.read()
@@ -139,27 +145,44 @@ class HandwashSystem:
         # Sample frames according to the sampling rate
         if self.frame_count % (int)(self.video_fps / self.sampling_rate) == 0:
             # Create a Frame Object
+
+            # def manipulate_frame():
             frame_object = Frame.Frame(image)
             # Preprocess the frame for prediction
-            frame_object.preprocess(28)
+            frame_object.preprocess(112)
 
             # Generate the optical flow for the image
-            # frame_object.generate_optical_flow(previous_frame)
+            frame_object.generate_optical_flow(previous_frame)
 
-            # Predict the frame
+            # Predict the frame object's class here
+            frame_object.predict_frame()
 
             self.frame_buffer.add_to_buffer(frame_object)
 
-        if( self.frame_count % 30 == 0 ):
-            self.frame_buffer.get_step_predicted()
+            # frame_thread = threading.Thread(target=manipulate_frame)
+            # # t.daemon = True
+            # frame_thread.start()
+
+
+        if( self.frame_count % 92 == 0 ):
+            step_completed = self.frame_buffer.get_step_predicted()
+            self.handwash_steps.add_step(step_completed)
 
         ret, jpeg = cv2.imencode('.jpg', image)
 
         # Store the current Image as the previous image
-        previous_image = image
+        previous_frame = image
 
-        return jpeg.tobytes()
+        # Increment frame_count
+        self.frame_count += 1
 
+        return [jpeg.tobytes()]
+
+    def get_frame_buffer_instance(self):
+        '''
+        Function to pass the FrameBuffer Instance
+        '''
+        return self.frame_buffer
 
 
     def check_buffer(self):

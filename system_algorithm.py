@@ -68,7 +68,7 @@ Loading Model
 '''
 # model = load_model("/media/mukund/OS_Install/Mechanical Engineering/Sem VIII/Hand Sanitisation/Akash/trail.h5")
 # fusion_model = load_model("/media/mukund/OS_Install/Mechanical Engineering/Sem VIII/Hand Sanitisation/Live Demo/spatial_model_19_0.94.h5")
-fusion_model = load_model("/home/akash/Desktop/HandWash/pyflow/final_combined_fused_model_pyflow_demo_10_1.00.h5")
+fusion_model = load_model("final_combined_fused_model_pyflow_demo_10_1.00.h5")
 
 ''' 
 Setting Image Parameters
@@ -156,7 +156,7 @@ def add_to_buffer(class_predicted, score):
     buffer_pointer = (buffer_pointer + 1)%max_length_of_frame_buffer
 
 def steps_completed(step_number):
-    if(step_number == 2)
+    if(step_number == 2):
         step_index = step_number - 1
         if(step_2l == True and step_2r == True):
             step_checker = 0

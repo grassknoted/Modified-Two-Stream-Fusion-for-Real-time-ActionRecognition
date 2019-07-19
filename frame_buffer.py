@@ -1,3 +1,4 @@
+
 #===============================================================
 # Title:   frame_buffer.py
 # Author:  Akash Nagaraj (grassknoted@gmail.com)
@@ -30,6 +31,9 @@ import cv2
 # Time import to track the time taken by different components
 # of the system
 import time
+
+# Default dictionary to handle buffer predictions
+from collections import defaultdict
 
 # Warnings import to warn user of certain pitfalls of the system
 import warnings
@@ -108,7 +112,6 @@ class FrameBuffer:
         Parameters:
         @frame_object : The frame object to be added to the buffer
         '''
-        # TODO: Predict the frame object's class here
 
         # Add the frame_object to the position pointed to by the frame_buffer_pointer
         self.placeholder_frame_buffer_array[self.frame_buffer_pointer] = frame_object
@@ -162,11 +165,13 @@ class FrameBuffer:
         ''' 
         Returns the step predicted the most in the buffer
         '''
-        steps = {}
+        steps = defaultdict(lambda: 0)
 
         for prediction in self.frame_buffer_array:
-            prediction.get_frame_id()
-        
+            steps[prediction.class_predicted] += 1
+
+        print("STEP PREDICTED:",max(steps, key=steps.get))
+        return max(steps, key=steps.get)       
 
     
     def clear_buffer(self):

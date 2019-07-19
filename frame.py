@@ -31,11 +31,17 @@ import cv2
 # of the system
 import time
 
+# Import pyflow (custom library) to generate optical flow
+import pyflow
+
 # Warnings import to warn user of certain pitfalls of the system
 import warnings
 
 # Numpy import for array manipulation
 import numpy as np
+
+# Import TensorFlow
+import tensorflow as tf
 
 # Randint import to randomly sample frames at the specified
 # sampling rate
@@ -46,29 +52,30 @@ from random import randint
 import matplotlib.pyplot as plt
 
 # Keras imports for the Neural Netork Framework
-# import keras
-# from keras.optimizers import Adam
-# from keras.preprocessing import image
-# from keras.models import load_model, Sequential
-# from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
+import keras
+from keras.optimizers import Adam
+from keras.preprocessing import image
+from keras import backend as KerasBackend
+from keras.models import load_model, Sequential
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
 
 # Scikit Learn import for the splitting of the dataset into
 # training and testing sets
 # from sklearn.model_selection import train_test_split
 
+# Time to load and print keras warnings
+time.sleep(3)
+
 # Variable to identify individual frames
 global_frame_id = 1
 
-'''
-Flow Options
-'''
-alpha = 0.012
-ratio = 0.75
-minWidth = 20
-nOuterFPIterations = 7
-nInnerFPIterations = 1
-nSORIterations = 30
-colType = 0  # 0 or default:RGB, 1:GRAY (but pass gray image with shape (h,w,1))
+
+class_names = {0:'STEP 6 RIGHT', 1:'STEP 7 RIGHT', 2:'STEP 7 LEFT', 3:'STEP 4 RIGHT', 4:'STEP 2 LEFT', 5:'STEP 6 LEFT', 6:'STEP 5 LEFT', 7:'STEP 3', 8:'STEP 2 RIGHT', 9:'STEP 5 RIGHT', 10:'STEP 4 LEFT', 11:'STEP 1'}
+
+# Loading the pre-trained prediction model
+# fusion_model = load_model("final_combined_fused_model_pyflow_demo_10_1.00.h5")
+model = None
+graph = None
 
 
 ''' 
@@ -77,11 +84,8 @@ Setting Image Parameters
 image_height = 112
 image_width = 112
 
-
 def process_flow(im1, flow_vector):
-    '''
-    Function to convert flow vector to image
-    '''
+
     hsv = np.zeros(im1.shape, dtype=np.uint8)
     hsv[:, :, 0] = 255
     hsv[:, :, 1] = 255
@@ -94,6 +98,26 @@ def process_flow(im1, flow_vector):
     h, s, grayscale = cv2.split(hsv)
 
     return(grayscale)
+
+def crop_to_height(image_array):
+    '''
+    Crop the stream to select only the Region of Interest
+    In our system, the region of interest is the middle of the screen
+    '''
+    height, width, channels = image_array.shape
+
+    if height == width:
+        return image_array
+
+    image_array = np.array(image_array)
+
+    assert height < width, "Height of the image is greater than width!"
+    excess_to_crop = int((width - height)/2)
+    cropped_image = image_array[0:height, excess_to_crop:(height+excess_to_crop)]
+    return cropped_image
+
+model = load_model("final_combined_fused_model_pyflow_demo_10_1.00.h5")
+graph = tf.get_default_graph()
 
 
 class Frame:
@@ -173,7 +197,7 @@ class Frame:
         try:
             assert not(pixel_values_array_input == None), "The frame passed was empty!"
         except ValueError:
-            print("The frame is successfully passed, with FrameID: "+str(global_frame_id)+", and shape:")
+            print("Frame Object Created- FrameID: "+str(global_frame_id)+", and shape:", end="")
         
         # Assign an ID to the frame
         self.frame_id = global_frame_id
@@ -206,8 +230,7 @@ class Frame:
         '''
 
         self.placeholder_pixel_values_array = np.array(cv2.resize(self.pixel_values_array, (new_image_height, new_image_width)))
-
-        print("Frame successfully resized to ", new_image_height, "x", new_image_width)
+        # print("Frame successfully resized to ", new_image_height, "x", new_image_width)
 
 
     def convert_to_grayscale(self):
@@ -253,24 +276,45 @@ class Frame:
         @previous_frame : A parameter of type Frame, that contains the previous frame
         '''
 
+        '''
+        Flow Options
+        '''
+        alpha = 0.012
+        ratio = 0.75
+        minWidth = 20
+        nOuterFPIterations = 7
+        nInnerFPIterations = 1
+        nSORIterations = 30
+        colType = 0  # 0 or default:RGB, 1:GRAY (but pass gray image with shape (h,w,1))
+
         assert (self.dense_optical_flow_vector == False), "Optical Flow already generated for the current frame."
+
+        # Cropping the previous_frame
+        previous_frame = crop_to_height(previous_frame)
+
+        # Resizing the previous frame
+        previous_frame = cv2.resize(previous_frame, (image_height, image_width))
 
         # Numpy Arrays
         previous_temporal_image = previous_frame.astype(float) / 255.
-        next_temporal_image = self.pixel_values_array.astype(float) / 255.
+        next_temporal_image = self.placeholder_pixel_values_array.astype(float) / 255.
+
+        # previous_temporal_image = previous_temporal_image.astype(np.float32)
+        # next_temporal_image = next_temporal_image.astype(np.float32)
+
+        # print("ACTUAL:")
+        # print(len(self.pixel_values_array),"x",len(self.pixel_values_array[0]), "x", len(self.pixel_values_array[0][0][0]))
 
         # Adding new method
         u, v, im2W = pyflow.coarse2fine_flow(previous_temporal_image, next_temporal_image, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations,nSORIterations, colType)
         temporal_image = np.concatenate((u[..., None], v[..., None]), axis=2)
-        temporal_image = process_flow(next_temporal_image, temporal_image)
+        temporal_image = process_flow(previous_temporal_image, temporal_image)
 
         
         # temporal_image_grayscale = cv2.cvtColor(temporal_image, cv2.COLOR_BGR2GRAY)
         temporal_image_after_reshape = np.reshape(temporal_image, (1, image_width, image_height, 1))
         
         self.placeholder_dense_optical_flow_vector = temporal_image_after_reshape
-
-        self.dense_optical_flow_vector = cv2.split(hsv_array)[2]
 
 
     def preprocess(self, final_frame_side):
@@ -281,7 +325,6 @@ class Frame:
         @final_frame_side : A parameter of type Frame, that contains the previous frame
         '''
 
-        self.convert_to_grayscale()
         self.crop_to_region()
         self.resize_frame(final_frame_side, final_frame_side)
 
@@ -328,22 +371,31 @@ class Frame:
             print("Dense Optical Flow Generated\t: Yes")
         
 
-    def predict_frame(self, previous_frame):
+    def predict_frame(self):
         '''
         Function to actually predict the frame
         '''
 
-        # TODO: CLEAN THIS CODE
-        current_prediction = fusion_model.predict([np.array(spatial_image_after_reshape), np.array(temporal_image_after_reshape)])
-        current_predictions.append(current_prediction)
-        predicted_frames += 1
+        # Convert the image to grayscale
+        self.convert_to_grayscale()
+        spatial_image_after_reshape = np.reshape(self.placeholder_pixel_values_array, (1, image_height,image_width,1))
 
+        with graph.as_default():
+            current_prediction = model.predict([np.array(spatial_image_after_reshape), np.array(self.dense_optical_flow_vector)])
+
+        # Get the class with maximum confidence
         class_prediction = np.argmax(current_prediction)
-        class_prob = round(current_prediction[0][class_prediction], 4)
 
-        predicted_class_text = printed_class_conversion[class_prediction]
+        # Rounding the class probability
+        class_probability = round(current_prediction[0][class_prediction], 4)
 
-        print("Predictions: ", class_conversion[class_prediction])
+        predicted_class = class_names[class_prediction]
+
+        print("FrameID:",self.frame_id,"predicted as:", predicted_class)
+
+        self.placeholder_class_predicted = predicted_class
+        self.placeholder_confidence_score = class_probability
+
 
 
     def get_frame_id(self):
@@ -351,7 +403,7 @@ class Frame:
         Function to show the Current Frame's FrameID
         '''
 
-        print("The current frame's Frame_ID is:", self.frame_id)
+        return (self.frame_id)
 
 
     def frame_predictions(self, class_predicted_input, confidence_score_input):

@@ -5,32 +5,48 @@
         <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
         <style>
             body {
+                /* background-image: url("/static/background_1.jpg"); */
                 background: #d8eff0;
                 font-family: 'Roboto';
                 font-size: 22px;
             }
             .main_container {
-                display: flex;
                 justify-content: space-around;
                 padding: 20px 0;
-                width: 80vw;
-                height: 80vh;
+                width: 20px;
+                height: 20px;
             }
             #live_video_feed {
-                display: flex;
-                padding-top: 5vh;
+                position: absolute;
+                left: 10vw;
+                top: 20vh;
+                width: 700px;
+                height: 500px;
             }
             #current_step_gif {
-                max-width: 300px;
-                max-height: 300px;
-                display:block;
+                position: absolute;
+                left: 63vw;
+                top: 12vh;
+                display: inline;
+                width: 350px;
+                height: 250px;
             }
             #step_information {
+                position:absolute;
+                left: 60vw;
+                top: 45vh;
                 display: block;
+                
             }
             .column1 {
-                float: left;
-                display: block;
+                position: absolute;
+                width: 200px;
+                left: 0vw;
+            }
+            .column2 {
+                position: absolute;
+                width: 200px;
+                left: 14vw;
             }
         </style>
     </head>
@@ -38,20 +54,27 @@
         <h1>Handwash System</h1>
         <div class = "main_container">
             <img id="live_video_feed" src="{{ url_for('video_feed') }}">
-            <img id="current_step_gif" src="{{ url_for('video_feed') }}">
+            <!-- <img id="current_step_gif" src="{{ url_for('video_feed') }}"> -->
+            <img id="current_step_gif" src="/static/STEP 2.gif">
+            
+
             <div id="step_information">
                 <div class="column1">
-                    <img class="step_image"> <h3> Step 1 </h3>
-                    <img class="step_image"> <h3> Step 2 </h3>
-                    <img class="step_image"> <h3> Step 3 </h3>
-                    <img class="step_image"> <h3> Step 4 </h3>
+                    <h3> <img id="step_1" src="/static/{{ step_image[0] }}.png" height=30px width=30px> Step 1</h3> 
+                    <h3> <img id="step_2_left" src="/static/{{ step_image[1] }}.png" height=30px width=30px> Step 2 Left </h3>
+                    <h3> <img id="step_2_right" src="/static/{{ step_image[2] }}.png" height=30px width=30px> Step 2 Right </h3>
+                    <h3> <img id="step_3" src="/static/{{ step_image[3] }}.png" height=30px width=30px> Step 3 </h3>
+                    <h3> <img id="step_4_left" src="/static/{{ step_image[4] }}.png" height=30px width=30px> Step 4 Left </h3>
+                    <h3> <img id="step_4_right" src="/static/{{ step_image[5] }}.png" height=30px width=30px> Step 4 Right </h3>
                 </div>
-                <!-- <div class="column2">
-                    <img class="step_image"> <h3> Step 5 </h3>
-                    <img class="step_image"> <h3> Step 6 </h3>
-                    <img class="step_image"> <h3> Step 7 </h3>
-                    <img class="step_image"> <h3> Step 8 </h3>
-                </div> -->
+                <div class="column2">
+                    <h3> <img id="step_5_left" src="/static/{{ step_image[6] }}.png" height=30px width=30px> Step 5 Left </h3>
+                    <h3> <img id="step_5_right" src="/static/{{ step_image[7] }}.png" height=30px width=30px> Step 5 Right </h3>
+                    <h3> <img id="step_6_left" src="/static/{{ step_image[8] }}.png" height=30px width=30px> Step 6 Left </h3>
+                    <h3> <img id="step_6_right" src="/static/{{ step_image[9] }}.png" height=30px width=30px> Step 6 Right </h3>
+                    <h3> <img id="step_7_left" src="/static/{{ step_image[10] }}.png" height=30px width=30px> Step 7 Left </h3>
+                    <h3> <img id="step_7_right" src="/static/{{ step_image[11] }}.png" height=30px width=30px> Step 7 Right </h3>
+                </div>
             </div>
         </div>
     </body>
