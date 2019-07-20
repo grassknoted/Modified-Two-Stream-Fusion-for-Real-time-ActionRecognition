@@ -110,9 +110,11 @@ class HandwashSteps:
 
         # Print the error message
         if 'or' in self.get_next_step():
-            print(incorrect_step + " is not the step to be performed, please perform either " + self.get_next_step() + '.')
+            return str(incorrect_step + " is not the step, please perform either " + self.get_next_step() + '.')
+        elif str(self.get_step_number(incorrect_step)) in self.get_next_step():
+            return str(incorrect_step + " has been successfully registered.")
         else:
-            print(incorrect_step + " is not the step to be performed, please perform " + self.get_next_step() + '.')
+            return str(incorrect_step + " is not the step, please perform " + self.get_next_step() + '.')
 
 
     def all_steps_completed(self):

@@ -66,10 +66,26 @@ import frame as Frame
 import frame_buffer as FrameBuffer
 
 # Import the HandwashSteps Module
-import handwash_steps as HandwashSteps
+# import handwash_steps as HandwashSteps
 
 # Initialize a previous temporal image
 previous_frame = np.array([0])
+
+step_images = [
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done",
+  "not_done"]
 
 class HandwashSystem:
 
@@ -83,7 +99,7 @@ class HandwashSystem:
         self.frame_buffer = FrameBuffer.FrameBuffer(15)
 
         # HandwashSteps
-        self.handwash_steps = HandwashSteps.HandwashSteps()
+        # self.handwash_steps = HandwashSteps.HandwashSteps()
 
         # Initialize the Video Stream
         self.live_stream = cv2.VideoCapture(0)
@@ -138,6 +154,7 @@ class HandwashSystem:
         '''
 
         global previous_frame
+        global step_images
         
         # Read the live feed frame
         success, image = self.live_stream.read()
@@ -163,11 +180,6 @@ class HandwashSystem:
             # # t.daemon = True
             # frame_thread.start()
 
-
-        if( self.frame_count % 92 == 0 ):
-            step_completed = self.frame_buffer.get_step_predicted()
-            self.handwash_steps.add_step(step_completed)
-
         ret, jpeg = cv2.imencode('.jpg', image)
 
         # Store the current Image as the previous image
@@ -176,6 +188,11 @@ class HandwashSystem:
         # Increment frame_count
         self.frame_count += 1
 
+        if( self.frame_count % 60 == 0 and self.frame_count > 90 ):
+            step_completed = self.frame_buffer.get_step_predicted()
+            return [jpeg.tobytes(), step_completed]
+            # self.handwash_steps.add_step(step_completed)
+        
         return [jpeg.tobytes()]
 
     def get_frame_buffer_instance(self):

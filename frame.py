@@ -194,10 +194,10 @@ class Frame:
         global global_frame_id
 
         # Try-Except block to handle empty images being passed to the class
-        try:
-            assert not(pixel_values_array_input == None), "The frame passed was empty!"
-        except ValueError:
-            print("Frame Object Created- FrameID: "+str(global_frame_id)+", and shape:", end="")
+        # try:
+        #     assert not(pixel_values_array_input == None), "The frame passed was empty!"
+        # except ValueError:
+        #     print("Frame Object Created- FrameID: "+str(global_frame_id)+", and shape:", end="")
         
         # Assign an ID to the frame
         self.frame_id = global_frame_id
@@ -217,7 +217,7 @@ class Frame:
         self.placeholder_confidence_score = -1
 
         # Print Shape attributes, when Frame Object is initialized
-        print(self.frame_height,"x", self.frame_width, "x", self.number_of_channels)
+        # print(self.frame_height,"x", self.frame_width, "x", self.number_of_channels)
 
 
     def resize_frame(self, new_image_width, new_image_height):
@@ -391,7 +391,7 @@ class Frame:
 
         predicted_class = class_names[class_prediction]
 
-        print("FrameID:",self.frame_id,"predicted as:", predicted_class)
+        # print("FrameID:",self.frame_id,"predicted as:", predicted_class)
 
         self.placeholder_class_predicted = predicted_class
         self.placeholder_confidence_score = class_probability
