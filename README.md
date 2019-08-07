@@ -21,9 +21,8 @@ b. Setup `pyflow`:
     
     
 #### 3. Dowload the trained model
-Download the model from [here](https://drive.google.com/file/d/1aXFfSilV6-leq9Jz07B39UP6zQT-Yskw/view?usp=sharing)
-
-Save the model in the parent folder of this repository, with the name: `current_final_handwash_model.h5`
+a. Download the model from [here](https://drive.google.com/file/d/1aXFfSilV6-leq9Jz07B39UP6zQT-Yskw/view?usp=sharing)
+b. Save the model in the parent folder of this repository, with the name: `current_final_handwash_model.h5`
 
 
 #### 4. Run the Flask app:
