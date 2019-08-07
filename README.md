@@ -42,3 +42,4 @@ b. Save the model in the parent folder of this repository, with the name: `curre
 ## Points to remember:
 1. A webcam must be connected to the computer/laptop.
 2. The model must be saved in this repository's parent folder.
+3. The computer must have internet access, since JavaScript is dynamically linked.
