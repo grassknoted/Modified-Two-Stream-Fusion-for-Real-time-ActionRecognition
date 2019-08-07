@@ -10,6 +10,7 @@ a. In the parent directory, run:
       $ pip install -r requirements.txt
       
       
+      
 #### 2. Compile and setup PyFlow:
 a. Change directory to `pyflow`
 
@@ -20,9 +21,12 @@ b. Setup `pyflow`:
       $ python setup.py build_ext -i
     
     
+    
 #### 3. Dowload the trained model
 a. Download the model from [here](https://drive.google.com/file/d/1aXFfSilV6-leq9Jz07B39UP6zQT-Yskw/view?usp=sharing)
+
 b. Save the model in the parent folder of this repository, with the name: `current_final_handwash_model.h5`
+
 
 
 #### 4. Run the Flask app:
@@ -30,7 +34,9 @@ b. Save the model in the parent folder of this repository, with the name: `curre
       $ python main_backup.py
       
       
+      
 #### 5. Open `localhost:8001` on your browser when the `* Debugger pin is active` message appears on the Terminal.
+
 
 
 ## Points to remember:
