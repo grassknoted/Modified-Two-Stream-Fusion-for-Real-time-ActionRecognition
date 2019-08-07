@@ -70,7 +70,9 @@ time.sleep(3)
 global_frame_id = 1
 
 
-class_names = {0:'STEP 6 RIGHT', 1:'STEP 7 RIGHT', 2:'STEP 7 LEFT', 3:'STEP 4 RIGHT', 4:'STEP 2 LEFT', 5:'STEP 6 LEFT', 6:'STEP 5 LEFT', 7:'STEP 3', 8:'STEP 2 RIGHT', 9:'STEP 5 RIGHT', 10:'STEP 4 LEFT', 11:'STEP 1'}
+# class_names = {0:'STEP 6 RIGHT', 1:'STEP 7 RIGHT', 2:'STEP 7 LEFT', 3:'STEP 4 RIGHT', 4:'STEP 2 LEFT', 5:'STEP 6 LEFT', 6:'STEP 5 LEFT', 7:'STEP 3', 8:'STEP 2 RIGHT', 9:'STEP 5 RIGHT', 10:'STEP 4 LEFT', 11:'STEP 1'}
+
+class_names = {0:'STEP 1', 1:'STEP 2 LEFT', 2:'STEP 2 RIGHT', 3:'STEP 3', 4:'STEP 4 LEFT', 5:'STEP 4 RIGHT', 6:'STEP 5 LEFT', 7:'STEP 5 RIGHT', 8:'STEP 6 LEFT', 9:'STEP 6 RIGHT', 10:'STEP 7 LEFT', 11:'STEP 7 RIGHT'}
 
 # Loading the pre-trained prediction model
 # fusion_model = load_model("final_combined_fused_model_pyflow_demo_10_1.00.h5")
@@ -116,7 +118,7 @@ def crop_to_height(image_array):
     cropped_image = image_array[0:height, excess_to_crop:(height+excess_to_crop)]
     return cropped_image
 
-model = load_model("final_combined_fused_model_pyflow_demo_10_1.00.h5")
+model = load_model("current_final_handwash_model.h5")
 graph = tf.get_default_graph()
 
 
