@@ -118,7 +118,7 @@ def crop_to_height(image_array):
     cropped_image = image_array[0:height, excess_to_crop:(height+excess_to_crop)]
     return cropped_image
 
-model = load_model("current_final_handwash_model.h5")
+model = load_model("handwash_step_model.h5")
 graph = tf.get_default_graph()
 
 
