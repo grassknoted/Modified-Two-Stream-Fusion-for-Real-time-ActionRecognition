@@ -23,7 +23,7 @@ b. Setup `pyflow`:
     
     
 #### 3. Dowload the trained model
-a. Download the model from [here](https://drive.google.com/file/d/1aXFfSilV6-leq9Jz07B39UP6zQT-Yskw/view?usp=sharing)
+a. Download the model from [here](https://drive.google.com/file/d/1vZm3LDdJLwBP-1LNVCV9oP8a77lRUjvp/view?usp=sharing)
 
 b. Save the model in the parent folder of this repository, with the name: `current_final_handwash_model.h5`
 
