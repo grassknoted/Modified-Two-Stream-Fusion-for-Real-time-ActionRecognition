@@ -1,7 +1,7 @@
 flask
 opencv-python
-numpy
-pandas
+numpy==1.17.0
+pandas==0.25.3
 matplotlib
-tensorflow
-keras
+tensorflow==1.14.0
+keras==2.2.4
